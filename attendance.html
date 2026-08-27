@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>出缺勤打卡系統</title>
+    <link rel="stylesheet" href="attendance.css">
+</head>
+<body>
+    <!-- 導航列 -->
+    <nav class="top-nav">
+        <a href="index.html">報價單系統</a>
+        <a href="attendance.html" class="active">出缺勤打卡系統</a>
+    </nav>
+
+    <!-- 登入畫面 -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-card">
+            <h1>出缺勤打卡系統</h1>
+            <p class="login-subtitle">請選擇或輸入您的姓名</p>
+            <div class="login-form">
+                <div class="form-group">
+                    <label>姓名：</label>
+                    <input type="text" id="loginName" placeholder="請輸入姓名" autocomplete="off">
+                </div>
+                <div id="userList" class="user-list"></div>
+                <button class="btn btn-primary btn-login" onclick="login()">登入</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主系統畫面 -->
+    <div id="mainScreen" class="main-screen" style="display:none;">
+        <div class="container">
+            <!-- 頂部資訊列 -->
+            <div class="top-bar">
+                <div class="user-info">
+                    <span class="user-icon">&#128100;</span>
+                    <span id="currentUserName" class="user-name"></span>
+                </div>
+                <div class="top-bar-actions">
+                    <button class="btn btn-clock" id="btnClockIn" onclick="clockIn()">上班打卡</button>
+                    <button class="btn btn-clock btn-clock-out" id="btnClockOut" onclick="clockOut()">下班打卡</button>
+                    <button class="btn btn-secondary btn-sm" onclick="logout()">登出</button>
+                </div>
+            </div>
+
+            <!-- 今日狀態 -->
+            <div class="today-status" id="todayStatus">
+                <div class="today-date" id="todayDate"></div>
+                <div class="today-records" id="todayRecords"></div>
+            </div>
+
+            <!-- 日曆區域 -->
+            <section class="section calendar-section">
+                <div class="calendar-header">
+                    <button class="btn btn-nav" onclick="changeMonth(-1)">&#9664;</button>
+                    <h2 id="calendarTitle"></h2>
+                    <button class="btn btn-nav" onclick="changeMonth(1)">&#9654;</button>
+                    <button class="btn btn-today" onclick="goToday()">今天</button>
+                </div>
+                <div class="calendar-weekdays">
+                    <div class="weekday sun">日</div>
+                    <div class="weekday">一</div>
+                    <div class="weekday">二</div>
+                    <div class="weekday">三</div>
+                    <div class="weekday">四</div>
+                    <div class="weekday">五</div>
+                    <div class="weekday sat">六</div>
+                </div>
+                <div class="calendar-grid" id="calendarGrid"></div>
+
+                <!-- 圖例 -->
+                <div class="legend">
+                    <div class="legend-item"><span class="legend-dot dot-present"></span>已出勤</div>
+                    <div class="legend-item"><span class="legend-dot dot-makeup"></span>補打卡</div>
+                    <div class="legend-item"><span class="legend-dot dot-absent"></span>缺勤</div>
+                    <div class="legend-item"><span class="legend-dot dot-holiday"></span>國定假日</div>
+                    <div class="legend-item"><span class="legend-dot dot-weekend"></span>週末</div>
+                    <div class="legend-item"><span class="legend-dot dot-future"></span>未到</div>
+                </div>
+            </section>
+
+            <!-- 月度統計 -->
+            <section class="section stats-section">
+                <h2>本月出勤統計</h2>
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="statWorkdays">0</div>
+                        <div class="stat-label">應出勤天數</div>
+                    </div>
+                    <div class="stat-card present">
+                        <div class="stat-number" id="statPresent">0</div>
+                        <div class="stat-label">已出勤</div>
+                    </div>
+                    <div class="stat-card absent">
+                        <div class="stat-number" id="statAbsent">0</div>
+                        <div class="stat-label">缺勤</div>
+                    </div>
+                    <div class="stat-card makeup">
+                        <div class="stat-number" id="statMakeup">0</div>
+                        <div class="stat-label">補打卡</div>
+                    </div>
+                    <div class="stat-card holiday">
+                        <div class="stat-number" id="statHoliday">0</div>
+                        <div class="stat-label">國定假日</div>
+                    </div>
+                    <div class="stat-card rate">
+                        <div class="stat-number" id="statRate">0%</div>
+                        <div class="stat-label">出勤率</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 出勤明細 -->
+            <section class="section detail-section">
+                <h2>本月出勤明細</h2>
+                <table class="detail-table">
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>星期</th>
+                            <th>狀態</th>
+                            <th>上班時間</th>
+                            <th>下班時間</th>
+                            <th>備註</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detailBody"></tbody>
+                </table>
+            </section>
+        </div>
+    </div>
+
+    <!-- 打卡/補打卡 Modal -->
+    <div id="punchModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">打卡</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-date" id="modalDate"></div>
+                <div class="modal-existing" id="modalExisting"></div>
+                <div class="form-group">
+                    <label>出勤狀態：</label>
+                    <div class="status-selector">
+                        <label class="status-option">
+                            <input type="radio" name="modalType" value="normal" checked>
+                            <span class="status-option-label present">已出勤</span>
+                        </label>
+                        <label class="status-option">
+                            <input type="radio" name="modalType" value="makeup">
+                            <span class="status-option-label makeup">補打卡</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>上班時間：</label>
+                    <input type="time" id="modalClockIn" step="60">
+                </div>
+                <div class="form-group">
+                    <label>下班時間：</label>
+                    <input type="time" id="modalClockOut" step="60">
+                </div>
+                <div class="form-group">
+                    <label>備註：</label>
+                    <input type="text" id="modalNote" placeholder="選填，例如：請假、出差...">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="savePunch()">儲存</button>
+                <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+                <button class="btn btn-danger" id="btnDeleteRecord" onclick="deleteRecord()" style="display:none;">刪除紀錄</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="attendance.js"></script>
+</body>
+</html>

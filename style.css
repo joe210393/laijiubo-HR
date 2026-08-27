@@ -1,0 +1,455 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Microsoft JhengHei', '微軟正黑體', Arial, sans-serif;
+    background: #f5f5f5;
+    min-height: 100vh;
+    padding: 20px;
+    padding-top: 0;
+}
+
+/* 導航列 */
+.top-nav {
+    background: #667eea;
+    padding: 0 30px;
+    display: flex;
+    gap: 0;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    margin: -20px -20px 20px -20px;
+}
+
+.top-nav a {
+    color: rgba(255, 255, 255, 0.75);
+    text-decoration: none;
+    padding: 14px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.2s;
+    border-bottom: 3px solid transparent;
+}
+
+.top-nav a:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.top-nav a.active {
+    color: #fff;
+    border-bottom-color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 2em;
+    border-bottom: 2px solid #667eea;
+    padding-bottom: 15px;
+    font-weight: 600;
+}
+
+h2 {
+    color: #667eea;
+    margin-bottom: 20px;
+    font-size: 1.3em;
+    border-left: 3px solid #667eea;
+    padding-left: 10px;
+    font-weight: 600;
+}
+
+.section {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+    font-weight: bold;
+}
+
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group input[type="file"],
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.image-preview {
+    margin-top: 10px;
+    width: 150px;
+    height: 150px;
+    border: 2px dashed #ddd;
+    border-radius: 5px;
+    padding: 5px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fafafa;
+    overflow: hidden;
+}
+
+.image-preview img {
+    max-width: 100%;
+    max-height: 100%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 3px;
+}
+
+.tax-option {
+    margin-bottom: 15px;
+}
+
+.tax-option label {
+    margin-right: 20px;
+    font-weight: normal;
+    cursor: pointer;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background: white;
+}
+
+table th,
+table td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+table th {
+    background: #667eea;
+    color: white;
+    font-weight: bold;
+}
+
+table tbody tr:nth-child(even) {
+    background: #f8f9fa;
+}
+
+table tbody tr:hover {
+    background: #e8e9ff;
+}
+
+table input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+.text-right {
+    text-align: right !important;
+}
+
+.total-amount {
+    font-weight: bold;
+    color: #667eea;
+    font-size: 1.1em;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: bold;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5568d3;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+    margin-left: 10px;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.btn-add {
+    background: #28a745;
+    color: white;
+    margin-top: 15px;
+}
+
+.btn-add:hover {
+    background: #218838;
+}
+
+.btn-delete {
+    background: #dc3545;
+    color: white;
+    padding: 5px 10px;
+    font-size: 12px;
+}
+
+.btn-delete:hover {
+    background: #c82333;
+}
+
+.actions {
+    text-align: center;
+    padding: 30px;
+    background: white;
+    border-radius: 8px;
+}
+
+/* 設定區域樣式 */
+.settings-section {
+    margin-bottom: 30px;
+}
+
+.settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 20px;
+}
+
+.settings-block {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+}
+
+.settings-block h3 {
+    color: #667eea;
+    margin-bottom: 15px;
+    font-size: 1.1em;
+    border-bottom: 2px solid #667eea;
+    padding-bottom: 8px;
+}
+
+.quote-header {
+    margin-bottom: 15px;
+}
+
+.quote-number-group {
+    display: inline-block;
+    width: auto;
+    min-width: 300px;
+}
+
+.quote-number-input {
+    font-size: 16px;
+    font-weight: bold;
+    color: #667eea;
+}
+
+/* 報價單預覽區域 */
+.quote-preview-section {
+    margin-top: 40px;
+}
+
+.quote-preview {
+    position: relative;
+    min-height: 900px;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 30px;
+    font-family: 'Microsoft JhengHei', '微軟正黑體', Arial, sans-serif;
+}
+
+/* Logo 左上角 */
+.quote-logo {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    width: 100px;
+    height: 100px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fafafa;
+    overflow: hidden;
+}
+
+.quote-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* 報價公司區塊 */
+.quote-company-block {
+    position: absolute;
+    top: 30px;
+    left: 150px;
+    max-width: 350px;
+}
+
+.quote-label {
+    font-weight: bold;
+    font-size: 16px;
+    color: #667eea;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #667eea;
+    padding-bottom: 5px;
+}
+
+.quote-text {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 5px;
+    line-height: 1.8;
+}
+
+/* 客戶資訊區塊 */
+.quote-customer-block {
+    position: absolute;
+    top: 30px;
+    right: 200px;
+    max-width: 350px;
+}
+
+/* 報價單編號（表格上方左側） */
+.quote-number-preview {
+    position: absolute;
+    top: 200px;
+    left: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+.quote-number-preview span {
+    color: #667eea;
+}
+
+/* 日期資訊（發票章左邊） */
+.quote-dates {
+    position: absolute;
+    bottom: 80px;
+    right: 200px;
+    text-align: right;
+    font-size: 14px;
+    color: #666;
+    line-height: 2;
+}
+
+.quote-dates div {
+    margin-bottom: 5px;
+}
+
+/* 發票章（右下角虛線框） */
+.quote-stamp-box {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    width: 120px;
+    height: 120px;
+    border: 2px dashed #999;
+    border-radius: 5px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #fafafa;
+}
+
+.stamp-box-label {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.stamp-box-content {
+    width: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.stamp-box-content img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    object-position: center;
+    /* 確保圖片保持正方形，取較小的尺寸 */
+}
+
+@media print {
+    body {
+        background: white;
+    }
+    .container {
+        box-shadow: none;
+    }
+    .btn {
+        display: none;
+    }
+}
