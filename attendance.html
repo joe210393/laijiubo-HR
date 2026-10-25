@@ -41,6 +41,7 @@
                 <div class="top-bar-actions">
                     <button class="btn btn-clock" id="btnClockIn" onclick="clockIn()">上班打卡</button>
                     <button class="btn btn-clock btn-clock-out" id="btnClockOut" onclick="clockOut()">下班打卡</button>
+                    <button class="btn btn-auto" onclick="autoClockMonth()">⚡ 本月自動打卡</button>
                     <button class="btn btn-secondary btn-sm" onclick="logout()">登出</button>
                 </div>
             </div>
@@ -75,6 +76,7 @@
                     <div class="legend-item"><span class="legend-dot dot-present"></span>已出勤</div>
                     <div class="legend-item"><span class="legend-dot dot-makeup"></span>補打卡</div>
                     <div class="legend-item"><span class="legend-dot dot-absent"></span>缺勤</div>
+                    <div class="legend-item"><span class="legend-dot dot-typhoon"></span>颱風假</div>
                     <div class="legend-item"><span class="legend-dot dot-holiday"></span>國定假日</div>
                     <div class="legend-item"><span class="legend-dot dot-weekend"></span>週末</div>
                     <div class="legend-item"><span class="legend-dot dot-future"></span>未到</div>
@@ -100,6 +102,10 @@
                     <div class="stat-card makeup">
                         <div class="stat-number" id="statMakeup">0</div>
                         <div class="stat-label">補打卡</div>
+                    </div>
+                    <div class="stat-card typhoon">
+                        <div class="stat-number" id="statTyphoon">0</div>
+                        <div class="stat-label">颱風假</div>
                     </div>
                     <div class="stat-card holiday">
                         <div class="stat-number" id="statHoliday">0</div>
@@ -153,6 +159,10 @@
                         <label class="status-option">
                             <input type="radio" name="modalType" value="makeup">
                             <span class="status-option-label makeup">補打卡</span>
+                        </label>
+                        <label class="status-option">
+                            <input type="radio" name="modalType" value="typhoon">
+                            <span class="status-option-label typhoon">颱風假</span>
                         </label>
                     </div>
                 </div>

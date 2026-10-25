@@ -116,6 +116,28 @@ function isWorkday(ds) {
     return !isWeekend(ds) && !isHoliday(ds);
 }
 
+function isTyphoonDay(user, ds) {
+    var record = getRecord(user, ds);
+    return record && record.type === 'typhoon';
+}
+
+function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function randomClockIn() {
+    var h = 8;
+    var m = randomInt(50, 59);
+    if (m >= 60) { h = 9; m = 0; }
+    return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+}
+
+function randomClockOut() {
+    var h = 18;
+    var m = randomInt(0, 15);
+    return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+}
+
 function isPast(ds) {
     return ds < todayStr();
 }
@@ -132,7 +154,7 @@ function isFuture(ds) {
 function getUsers() {
     try {
         return JSON.parse(localStorage.getItem('attendance_users') || '[]');
-    } catch { return []; }
+    } catch (e) { return []; }
 }
 
 function saveUsers(users) {
@@ -150,7 +172,7 @@ function addUser(name) {
 function getRecords(user) {
     try {
         return JSON.parse(localStorage.getItem(`attendance_${user}`) || '{}');
-    } catch { return {}; }
+    } catch (e) { return {}; }
 }
 
 function saveRecords(user, records) {
@@ -371,7 +393,9 @@ function renderCalendar() {
             classes.push('weekend', 'saturday');
         }
 
-        if (record && record.clockIn) {
+        if (record && record.type === 'typhoon') {
+            classes.push('typhoon-day');
+        } else if (record && record.clockIn) {
             if (record.type === 'makeup') {
                 classes.push('makeup-day');
             } else {
@@ -394,7 +418,10 @@ function renderCalendar() {
             inner += `<div class="day-label">${getHolidayName(ds)}</div>`;
         }
 
-        if (record && record.clockIn) {
+        if (record && record.type === 'typhoon') {
+            inner += '<div class="day-label">颱風假</div>';
+            inner += '<div class="day-status"></div>';
+        } else if (record && record.clockIn) {
             inner += `<div class="day-time">${record.clockIn}</div>`;
             inner += '<div class="day-status"></div>';
         } else if (isPast(ds) && isWorkday(ds)) {
@@ -408,18 +435,18 @@ function renderCalendar() {
 
 // ====== 統計 ======
 function renderStats() {
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    const tds = todayStr();
+    var daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-    let workdays = 0;
-    let presentCount = 0;
-    let absentCount = 0;
-    let makeupCount = 0;
-    let holidayCount = 0;
+    var workdays = 0;
+    var presentCount = 0;
+    var absentCount = 0;
+    var makeupCount = 0;
+    var typhoonCount = 0;
+    var holidayCount = 0;
 
-    for (let d = 1; d <= daysInMonth; d++) {
-        const ds = dateStr(currentYear, currentMonth, d);
-        const record = getRecord(currentUser, ds);
+    for (var d = 1; d <= daysInMonth; d++) {
+        var ds = dateStr(currentYear, currentMonth, d);
+        var record = getRecord(currentUser, ds);
 
         if (isHoliday(ds)) {
             holidayCount++;
@@ -427,38 +454,42 @@ function renderStats() {
         }
         if (isWeekend(ds)) continue;
 
+        if (record && record.type === 'typhoon') {
+            typhoonCount++;
+            continue;
+        }
+
         workdays++;
 
         if (record && record.clockIn) {
             if (record.type === 'makeup') {
                 makeupCount++;
-                presentCount++;
-            } else {
-                presentCount++;
             }
-        } else if (isPast(ds) || isToday(ds)) {
-            if (!isFuture(ds) && isWorkday(ds) && !record) {
-                absentCount++;
-            }
+            presentCount++;
+        } else if (!isFuture(ds) && isWorkday(ds)) {
+            absentCount++;
         }
     }
 
-    const pastWorkdays = countPastWorkdays();
-    const rate = pastWorkdays > 0 ? Math.round((presentCount / pastWorkdays) * 100) : 0;
+    var pastWorkdays = countPastWorkdays();
+    var rate = pastWorkdays > 0 ? Math.round((presentCount / pastWorkdays) * 100) : 0;
 
     document.getElementById('statWorkdays').textContent = workdays;
     document.getElementById('statPresent').textContent = presentCount;
     document.getElementById('statAbsent').textContent = absentCount;
     document.getElementById('statMakeup').textContent = makeupCount;
+    document.getElementById('statTyphoon').textContent = typhoonCount;
     document.getElementById('statHoliday').textContent = holidayCount;
     document.getElementById('statRate').textContent = rate + '%';
 }
 
 function countPastWorkdays() {
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    let count = 0;
-    for (let d = 1; d <= daysInMonth; d++) {
-        const ds = dateStr(currentYear, currentMonth, d);
+    var daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    var count = 0;
+    for (var d = 1; d <= daysInMonth; d++) {
+        var ds = dateStr(currentYear, currentMonth, d);
+        var record = getRecord(currentUser, ds);
+        if (record && record.type === 'typhoon') continue;
         if (isWorkday(ds) && !isFuture(ds)) count++;
     }
     return count;
@@ -489,6 +520,10 @@ function renderDetail() {
         } else if (isWeekend(ds)) {
             status = '週末';
             statusClass = 'weekend';
+        } else if (record && record.type === 'typhoon') {
+            status = '颱風假';
+            statusClass = 'typhoon';
+            note = record.note || '';
         } else if (record && record.clockIn) {
             status = record.type === 'makeup' ? '補打卡' : '已出勤';
             statusClass = record.type === 'makeup' ? 'makeup' : 'present';
@@ -557,9 +592,26 @@ function closeModal() {
 function savePunch() {
     if (!selectedDate) return;
 
-    const clockIn = document.getElementById('modalClockIn').value;
-    const clockOut = document.getElementById('modalClockOut').value;
-    const note = document.getElementById('modalNote').value.trim();
+    var selectedType = document.querySelector('input[name="modalType"]:checked').value;
+    var clockIn = document.getElementById('modalClockIn').value;
+    var clockOut = document.getElementById('modalClockOut').value;
+    var note = document.getElementById('modalNote').value.trim();
+
+    if (selectedType === 'typhoon') {
+        var record = {
+            clockIn: '',
+            clockOut: '',
+            note: note || '颱風假',
+            type: 'typhoon'
+        };
+        setRecord(currentUser, selectedDate, record);
+        closeModal();
+        updateTodayStatus();
+        renderCalendar();
+        renderStats();
+        renderDetail();
+        return;
+    }
 
     if (!clockIn) {
         alert('請輸入上班時間！');
@@ -571,9 +623,7 @@ function savePunch() {
         return;
     }
 
-    const selectedType = document.querySelector('input[name="modalType"]:checked').value;
-
-    const record = {
+    var record = {
         clockIn: clockIn,
         clockOut: clockOut || '',
         note: note,
@@ -594,6 +644,44 @@ function deleteRecord() {
 
     deleteRecordData(currentUser, selectedDate);
     closeModal();
+    updateTodayStatus();
+    renderCalendar();
+    renderStats();
+    renderDetail();
+}
+
+// ====== 本月自動打卡 ======
+function autoClockMonth() {
+    if (!currentUser) return;
+
+    var daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    var today = todayStr();
+    var count = 0;
+
+    for (var d = 1; d <= daysInMonth; d++) {
+        var ds = dateStr(currentYear, currentMonth, d);
+        if (isFuture(ds)) continue;
+        if (!isWorkday(ds)) continue;
+
+        var existing = getRecord(currentUser, ds);
+        if (existing) continue;
+
+        var record = {
+            clockIn: randomClockIn(),
+            clockOut: randomClockOut(),
+            note: '',
+            type: 'normal'
+        };
+        setRecord(currentUser, ds, record);
+        count++;
+    }
+
+    if (count > 0) {
+        alert('已自動打卡 ' + count + ' 天（上班 8:50~9:00 / 下班 18:00~18:15 隨機）');
+    } else {
+        alert('本月沒有需要補打卡的工作日');
+    }
+
     updateTodayStatus();
     renderCalendar();
     renderStats();

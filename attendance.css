@@ -292,6 +292,18 @@ h2 {
     transform: none;
 }
 
+.btn-auto {
+    background: #6f42c1;
+    color: white;
+    font-size: 13px;
+    padding: 8px 16px;
+}
+
+.btn-auto:hover {
+    background: #5a32a3;
+    transform: translateY(-1px);
+}
+
 /* 日曆 */
 .calendar-section h2 {
     border-left: none;
@@ -475,6 +487,19 @@ h2 {
     background: #ff9800;
 }
 
+.calendar-day.typhoon-day {
+    background: #e1f5fe;
+}
+
+.calendar-day.typhoon-day .day-status {
+    background: #0288d1;
+}
+
+.calendar-day.typhoon-day .day-label {
+    color: #0288d1;
+    font-weight: 600;
+}
+
 .calendar-day.absent-day {
     background: #ffebee;
 }
@@ -523,6 +548,7 @@ h2 {
 .dot-present { background: #28a745; }
 .dot-makeup { background: #ff9800; }
 .dot-absent { background: #dc3545; }
+.dot-typhoon { background: #0288d1; }
 .dot-holiday { background: #dc3545; opacity: 0.4; }
 .dot-weekend { background: #ccc; }
 .dot-future { background: #e0e0e0; }
@@ -550,6 +576,7 @@ h2 {
 .stat-card.present { background: #e8f5e9; border-color: #c8e6c9; }
 .stat-card.absent { background: #ffebee; border-color: #ffcdd2; }
 .stat-card.makeup { background: #fff8e1; border-color: #ffecb3; }
+.stat-card.typhoon { background: #e1f5fe; border-color: #b3e5fc; }
 .stat-card.holiday { background: #fce4ec; border-color: #f8bbd0; }
 .stat-card.rate { background: #e3f2fd; border-color: #bbdefb; }
 
@@ -563,6 +590,7 @@ h2 {
 .stat-card.present .stat-number { color: #28a745; }
 .stat-card.absent .stat-number { color: #dc3545; }
 .stat-card.makeup .stat-number { color: #ff9800; }
+.stat-card.typhoon .stat-number { color: #0288d1; }
 .stat-card.holiday .stat-number { color: #e91e63; }
 .stat-card.rate .stat-number { color: #1976d2; }
 
@@ -619,6 +647,7 @@ h2 {
 .status-badge.present { background: #e8f5e9; color: #28a745; }
 .status-badge.absent { background: #ffebee; color: #dc3545; }
 .status-badge.makeup { background: #fff8e1; color: #ff9800; }
+.status-badge.typhoon { background: #e1f5fe; color: #0288d1; }
 .status-badge.holiday { background: #fce4ec; color: #e91e63; }
 .status-badge.weekend { background: #f5f5f5; color: #999; }
 .status-badge.future { background: #f5f5f5; color: #bbb; }
@@ -752,6 +781,10 @@ h2 {
     color: #ff9800;
 }
 
+.status-option-label.typhoon {
+    color: #0288d1;
+}
+
 .status-option input[type="radio"]:checked + .status-option-label.present {
     background: #e8f5e9;
     border-color: #28a745;
@@ -760,6 +793,11 @@ h2 {
 .status-option input[type="radio"]:checked + .status-option-label.makeup {
     background: #fff8e1;
     border-color: #ff9800;
+}
+
+.status-option input[type="radio"]:checked + .status-option-label.typhoon {
+    background: #e1f5fe;
+    border-color: #0288d1;
 }
 
 .modal-date {
