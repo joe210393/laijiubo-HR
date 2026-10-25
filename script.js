@@ -1,9 +1,10 @@
 // 全域變數
 let logoBase64 = '';
 let stampBase64 = '';
-let logoImage = null; // 儲存圖片物件以便取得尺寸
-let stampImage = null; // 儲存圖片物件以便取得尺寸
+let logoImage = null;
+let stampImage = null;
 let productCounter = 0;
+let editingQuoteId = null; // 正在編輯的報價單 ID
 
 // 保存公司資訊到 localStorage
 function saveCompanyInfo() {
@@ -62,60 +63,352 @@ function loadCompanyInfo() {
     }
 }
 
+// ====== 客戶管理 ======
+function getCustomers() {
+    try { return JSON.parse(localStorage.getItem('quote_customers') || '[]'); }
+    catch { return []; }
+}
+
+function saveCustomersData(list) {
+    localStorage.setItem('quote_customers', JSON.stringify(list));
+}
+
+function renderCustomerSelect() {
+    const sel = document.getElementById('customerSelect');
+    const customers = getCustomers();
+    sel.innerHTML = '<option value="">— 請選擇或新增客戶 —</option>';
+    customers.forEach((c, i) => {
+        const label = c.name + (c.contact ? ` (${c.contact})` : '') + (c.taxId ? ` [${c.taxId}]` : '');
+        sel.innerHTML += `<option value="${i}">${label}</option>`;
+    });
+}
+
+function loadSelectedCustomer() {
+    const sel = document.getElementById('customerSelect');
+    if (sel.value === '') return;
+    const customers = getCustomers();
+    const c = customers[parseInt(sel.value)];
+    if (!c) return;
+    document.getElementById('customerName').value = c.name || '';
+    document.getElementById('customerContact').value = c.contact || '';
+    document.getElementById('customerPhone').value = c.phone || '';
+    document.getElementById('customerTaxId').value = c.taxId || '';
+    updateQuotePreview();
+}
+
+function saveCustomer() {
+    const name = document.getElementById('customerName').value.trim();
+    if (!name) { alert('請先填寫客戶公司名稱！'); return; }
+
+    const customer = {
+        name: name,
+        contact: document.getElementById('customerContact').value.trim(),
+        phone: document.getElementById('customerPhone').value.trim(),
+        taxId: document.getElementById('customerTaxId').value.trim()
+    };
+
+    const customers = getCustomers();
+    const existing = customers.findIndex(c => c.name === name);
+
+    if (existing >= 0) {
+        if (confirm(`客戶「${name}」已存在，是否覆蓋更新？`)) {
+            customers[existing] = customer;
+        } else { return; }
+    } else {
+        customers.push(customer);
+    }
+
+    saveCustomersData(customers);
+    renderCustomerSelect();
+    document.getElementById('customerSelect').value = customers.findIndex(c => c.name === name);
+    alert(`客戶「${name}」已儲存！`);
+}
+
+function deleteCustomer() {
+    const sel = document.getElementById('customerSelect');
+    if (sel.value === '') { alert('請先選擇要刪除的客戶！'); return; }
+    const customers = getCustomers();
+    const c = customers[parseInt(sel.value)];
+    if (!confirm(`確定要刪除客戶「${c.name}」嗎？`)) return;
+    customers.splice(parseInt(sel.value), 1);
+    saveCustomersData(customers);
+    renderCustomerSelect();
+}
+
+// ====== 報價單儲存/讀取 ======
+function getSavedQuotes() {
+    try { return JSON.parse(localStorage.getItem('saved_quotes') || '[]'); }
+    catch { return []; }
+}
+
+function saveSavedQuotes(list) {
+    localStorage.setItem('saved_quotes', JSON.stringify(list));
+}
+
+function collectQuoteData() {
+    const products = [];
+    document.querySelectorAll('#productsBody tr').forEach(row => {
+        products.push({
+            name: row.querySelector('.product-name').value || '',
+            quantity: row.querySelector('.product-quantity').value || '1',
+            price: row.querySelector('.product-price').value || '0'
+        });
+    });
+
+    return {
+        customerName: document.getElementById('customerName').value,
+        customerContact: document.getElementById('customerContact').value,
+        customerPhone: document.getElementById('customerPhone').value,
+        customerTaxId: document.getElementById('customerTaxId').value,
+        quoteNumber: document.getElementById('quoteNumber').value,
+        quoteDate: document.getElementById('quoteDate').value,
+        validUntil: document.getElementById('validUntil').value,
+        taxType: document.querySelector('input[name="taxType"]:checked').value,
+        notes: document.getElementById('notes').value,
+        products: products,
+        totalInclude: document.getElementById('totalInclude').textContent
+    };
+}
+
+function saveQuote() {
+    const data = collectQuoteData();
+    if (!data.customerName && !data.quoteNumber) {
+        alert('請至少填寫客戶名稱或報價單編號！');
+        return;
+    }
+
+    const quotes = getSavedQuotes();
+    const now = new Date().toLocaleString('zh-TW');
+
+    if (editingQuoteId !== null) {
+        const idx = quotes.findIndex(q => q.id === editingQuoteId);
+        if (idx >= 0) {
+            quotes[idx].data = data;
+            quotes[idx].updatedAt = now;
+            quotes[idx].title = data.quoteNumber || data.customerName || '未命名報價單';
+        }
+    } else {
+        const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        quotes.unshift({
+            id: id,
+            title: data.quoteNumber || data.customerName || '未命名報價單',
+            createdAt: now,
+            updatedAt: now,
+            data: data
+        });
+        editingQuoteId = id;
+    }
+
+    saveSavedQuotes(quotes);
+    renderSavedQuotes();
+    updateEditingIndicator();
+    alert('報價單已儲存！');
+}
+
+function loadQuote(id) {
+    const quotes = getSavedQuotes();
+    const quote = quotes.find(q => q.id === id);
+    if (!quote) { alert('找不到此報價單！'); return; }
+
+    if (editingQuoteId !== null) {
+        if (!confirm('目前有未儲存的編輯，確定要切換嗎？')) return;
+    }
+
+    const d = quote.data;
+
+    document.getElementById('customerName').value = d.customerName || '';
+    document.getElementById('customerContact').value = d.customerContact || '';
+    document.getElementById('customerPhone').value = d.customerPhone || '';
+    document.getElementById('customerTaxId').value = d.customerTaxId || '';
+    document.getElementById('quoteNumber').value = d.quoteNumber || '';
+    document.getElementById('quoteDate').value = d.quoteDate || '';
+    document.getElementById('validUntil').value = d.validUntil || '';
+    document.getElementById('notes').value = d.notes || '';
+
+    if (d.taxType) {
+        const radio = document.querySelector(`input[name="taxType"][value="${d.taxType}"]`);
+        if (radio) radio.checked = true;
+    }
+
+    document.getElementById('productsBody').innerHTML = '';
+    productCounter = 0;
+
+    if (d.products && d.products.length > 0) {
+        d.products.forEach(p => {
+            addProduct();
+            const row = document.getElementById(`product-${productCounter}`);
+            row.querySelector('.product-name').value = p.name || '';
+            row.querySelector('.product-quantity').value = p.quantity || '1';
+            row.querySelector('.product-price').value = p.price || '0';
+            const qtyInput = row.querySelector('.product-quantity');
+            calculateRow(qtyInput);
+        });
+    } else {
+        addProduct();
+    }
+
+    editingQuoteId = id;
+    updateEditingIndicator();
+    updateQuotePreview();
+    calculateTotal();
+    renderSavedQuotes();
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function deleteQuote(id) {
+    const quotes = getSavedQuotes();
+    const quote = quotes.find(q => q.id === id);
+    if (!quote) return;
+    if (!confirm(`確定要刪除報價單「${quote.title}」嗎？`)) return;
+
+    const updated = quotes.filter(q => q.id !== id);
+    saveSavedQuotes(updated);
+
+    if (editingQuoteId === id) {
+        editingQuoteId = null;
+        updateEditingIndicator();
+    }
+
+    renderSavedQuotes();
+}
+
+function newQuote() {
+    if (editingQuoteId !== null) {
+        if (!confirm('目前有正在編輯的報價單，確定要新建嗎？')) return;
+    }
+    editingQuoteId = null;
+
+    document.getElementById('customerName').value = '';
+    document.getElementById('customerContact').value = '';
+    document.getElementById('customerPhone').value = '';
+    document.getElementById('customerTaxId').value = '';
+    document.getElementById('notes').value = '';
+    document.getElementById('customerSelect').value = '';
+
+    document.getElementById('productsBody').innerHTML = '';
+    productCounter = 0;
+
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('quoteDate').value = today;
+    const qn = 'QT-' + new Date().getFullYear() + '-' +
+        String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+    document.getElementById('quoteNumber').value = qn;
+    const vd = new Date();
+    vd.setDate(vd.getDate() + 30);
+    document.getElementById('validUntil').value = vd.toISOString().split('T')[0];
+
+    document.querySelector('input[name="taxType"][value="exclude"]').checked = true;
+
+    addProduct();
+    calculateTotal();
+    updateQuotePreview();
+    updateEditingIndicator();
+    renderSavedQuotes();
+}
+
+function renderSavedQuotes() {
+    const container = document.getElementById('savedQuotesList');
+    const quotes = getSavedQuotes();
+
+    if (quotes.length === 0) {
+        container.innerHTML = '<p class="empty-hint">尚未儲存任何報價單</p>';
+        return;
+    }
+
+    let html = '';
+    quotes.forEach(q => {
+        const d = q.data;
+        const isEditing = editingQuoteId === q.id;
+        html += `
+            <div class="saved-quote-card${isEditing ? ' editing' : ''}">
+                <div class="saved-quote-info">
+                    <div class="saved-quote-title">
+                        ${escapeHtml(q.title)}
+                        ${isEditing ? '<span class="editing-indicator">編輯中</span>' : ''}
+                    </div>
+                    <div class="saved-quote-meta">
+                        <span>客戶：${escapeHtml(d.customerName || '—')}</span>
+                        <span>金額：${escapeHtml(d.totalInclude || '0')}</span>
+                        <span>建立：${escapeHtml(q.createdAt)}</span>
+                        ${q.updatedAt !== q.createdAt ? `<span>修改：${escapeHtml(q.updatedAt)}</span>` : ''}
+                    </div>
+                </div>
+                <div class="saved-quote-actions">
+                    <button class="btn btn-load" onclick="loadQuote('${q.id}')">載入修改</button>
+                    <button class="btn btn-delete" onclick="deleteQuote('${q.id}')">刪除</button>
+                </div>
+            </div>
+        `;
+    });
+    container.innerHTML = html;
+}
+
+function updateEditingIndicator() {
+    const h1 = document.querySelector('h1');
+    const existing = h1.querySelector('.editing-indicator');
+    if (existing) existing.remove();
+
+    if (editingQuoteId !== null) {
+        const quotes = getSavedQuotes();
+        const q = quotes.find(q => q.id === editingQuoteId);
+        if (q) {
+            const badge = document.createElement('span');
+            badge.className = 'editing-indicator';
+            badge.textContent = `編輯中：${q.title}`;
+            h1.appendChild(badge);
+        }
+    }
+}
+
 // 初始化
 document.addEventListener('DOMContentLoaded', function() {
-    // 載入保存的公司資訊
     loadCompanyInfo();
+    renderCustomerSelect();
+    renderSavedQuotes();
     
-    // 設定預設日期
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('quoteDate').value = today;
     
-    // 生成報價單編號
     const quoteNumber = 'QT-' + new Date().getFullYear() + '-' + 
                        String(Math.floor(Math.random() * 10000)).padStart(4, '0');
     document.getElementById('quoteNumber').value = quoteNumber;
     
-    // 設定有效期限（預設30天後）
     const validDate = new Date();
     validDate.setDate(validDate.getDate() + 30);
     document.getElementById('validUntil').value = validDate.toISOString().split('T')[0];
     
-    // Logo上傳處理
     document.getElementById('logoUpload').addEventListener('change', function(e) {
         handleImageUpload(e, 'logoPreview', function(base64) {
             logoBase64 = base64;
-            saveCompanyInfo(); // 自動保存
+            saveCompanyInfo();
             updateQuotePreview();
         });
     });
     
-    // 發票章上傳處理
     document.getElementById('stampUpload').addEventListener('change', function(e) {
         handleImageUpload(e, 'stampPreview', function(base64) {
             stampBase64 = base64;
-            saveCompanyInfo(); // 自動保存
+            saveCompanyInfo();
             updateQuotePreview();
         });
     });
     
-    // 綁定公司資訊輸入框的變化事件（自動保存）
     const companyFields = ['companyName', 'companyAddress', 'companyPhone', 'companyTaxId'];
     companyFields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
         if (field) {
             field.addEventListener('input', function() {
-                saveCompanyInfo(); // 自動保存
+                saveCompanyInfo();
                 updateQuotePreview();
             });
             field.addEventListener('change', function() {
-                saveCompanyInfo(); // 自動保存
+                saveCompanyInfo();
                 updateQuotePreview();
             });
         }
     });
     
-    // 綁定其他輸入框的變化事件來更新預覽
     const otherFields = [
         'customerName', 'customerContact', 'customerPhone', 'customerTaxId',
         'quoteNumber', 'quoteDate', 'validUntil'
@@ -129,10 +422,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // 初始化預覽
     updateQuotePreview();
     
-    // 稅率選擇變更時重新計算
     document.querySelectorAll('input[name="taxType"]').forEach(radio => {
         radio.addEventListener('change', function() {
             const rows = document.querySelectorAll('#productsBody tr');
@@ -145,7 +436,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // 新增第一筆商品
     addProduct();
 });
 
@@ -633,18 +923,18 @@ async function generatePDFWithCanvas() {
 // 清除所有資料（保留公司資訊）
 function clearAll() {
     if (confirm('確定要清除所有資料嗎？（公司資訊、Logo和發票章會保留）')) {
-        // 只清除客戶資訊和商品資訊，保留公司資訊
+        editingQuoteId = null;
+
         document.getElementById('customerName').value = '';
         document.getElementById('customerContact').value = '';
         document.getElementById('customerPhone').value = '';
         document.getElementById('customerTaxId').value = '';
+        document.getElementById('customerSelect').value = '';
         document.getElementById('notes').value = '';
         
-        // 清除商品列表
         document.getElementById('productsBody').innerHTML = '';
         productCounter = 0;
         
-        // 重置日期和編號
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('quoteDate').value = today;
         const quoteNumber = 'QT-' + new Date().getFullYear() + '-' + 
@@ -654,15 +944,14 @@ function clearAll() {
         const validDate = new Date();
         validDate.setDate(validDate.getDate() + 30);
         document.getElementById('validUntil').value = validDate.toISOString().split('T')[0];
+
+        document.querySelector('input[name="taxType"][value="exclude"]').checked = true;
         
-        // 重新新增一筆商品
         addProduct();
-        
-        // 重置總計
         calculateTotal();
-        
-        // 更新預覽
         updateQuotePreview();
+        updateEditingIndicator();
+        renderSavedQuotes();
         
         alert('資料已清除！（公司資訊已保留）');
     }

@@ -442,6 +442,176 @@ table input {
     /* 確保圖片保持正方形，取較小的尺寸 */
 }
 
+/* 客戶選擇器 */
+.customer-select-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.customer-select-row select {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    font-family: inherit;
+    background: white;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+
+.customer-select-row select:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.btn-save-customer {
+    float: right;
+    padding: 4px 12px !important;
+    font-size: 12px !important;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-save-customer:hover {
+    background: #218838;
+}
+
+.btn-delete-sm {
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s;
+    line-height: 1;
+}
+
+.btn-delete-sm:hover {
+    background: #c82333;
+}
+
+/* 儲存報價單區域 */
+.saved-quotes-section {
+    margin-bottom: 30px;
+}
+
+.saved-quotes-list {
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.empty-hint {
+    color: #999;
+    text-align: center;
+    padding: 20px;
+    font-size: 14px;
+}
+
+.saved-quote-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    background: #fafbff;
+    transition: all 0.15s;
+    gap: 12px;
+}
+
+.saved-quote-card:hover {
+    border-color: #667eea;
+    background: #f0f2ff;
+}
+
+.saved-quote-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.saved-quote-title {
+    font-weight: 700;
+    font-size: 15px;
+    color: #333;
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.saved-quote-meta {
+    font-size: 12px;
+    color: #888;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.saved-quote-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.saved-quote-actions .btn {
+    padding: 6px 14px;
+    font-size: 12px;
+    border-radius: 5px;
+}
+
+.btn-load {
+    background: #667eea;
+    color: white;
+}
+
+.btn-load:hover {
+    background: #5568d3;
+}
+
+.btn-save {
+    background: #17a2b8;
+    color: white;
+}
+
+.btn-save:hover {
+    background: #138496;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(23, 162, 184, 0.4);
+}
+
+.btn-new {
+    background: #28a745;
+    color: white;
+    margin-left: 10px;
+}
+
+.btn-new:hover {
+    background: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+}
+
+.editing-indicator {
+    display: inline-block;
+    background: #fff3cd;
+    color: #856404;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-left: 12px;
+    border: 1px solid #ffc107;
+}
+
 @media print {
     body {
         background: white;

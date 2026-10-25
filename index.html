@@ -18,6 +18,14 @@
 
     <div class="container">
         <h1>報價單生成系統</h1>
+
+        <!-- 已儲存的報價單 -->
+        <section class="section saved-quotes-section">
+            <h2>已儲存的報價單</h2>
+            <div id="savedQuotesList" class="saved-quotes-list">
+                <p class="empty-hint">尚未儲存任何報價單</p>
+            </div>
+        </section>
         
         <!-- 設定區域 -->
         <section class="section settings-section">
@@ -52,7 +60,19 @@
 
                 <!-- 客戶資訊設定 -->
                 <div class="settings-block">
-                    <h3>客戶資訊</h3>
+                    <h3>
+                        客戶資訊
+                        <button type="button" class="btn btn-save-customer" onclick="saveCustomer()">儲存此客戶</button>
+                    </h3>
+                    <div class="form-group">
+                        <label>選擇已儲存的客戶：</label>
+                        <div class="customer-select-row">
+                            <select id="customerSelect" onchange="loadSelectedCustomer()">
+                                <option value="">— 請選擇或新增客戶 —</option>
+                            </select>
+                            <button type="button" class="btn btn-delete-sm" onclick="deleteCustomer()" title="刪除選取的客戶">✕</button>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label>客戶公司名稱：</label>
                         <input type="text" id="customerName" placeholder="請輸入客戶公司名稱">
@@ -196,7 +216,9 @@
 
         <!-- 操作按鈕 -->
         <section class="section actions">
+            <button type="button" class="btn btn-save" onclick="saveQuote()">💾 儲存報價單</button>
             <button type="button" class="btn btn-primary" onclick="generatePDF()">生成PDF報價單</button>
+            <button type="button" class="btn btn-new" onclick="newQuote()">📄 新增報價單</button>
             <button type="button" class="btn btn-secondary" onclick="clearAll()">清除所有資料</button>
         </section>
     </div>
