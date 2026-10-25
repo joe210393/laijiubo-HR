@@ -498,13 +498,87 @@ table input {
     background: #c82333;
 }
 
+/* 導航徽章 */
+.nav-badge {
+    margin-left: auto !important;
+    display: flex !important;
+    align-items: center;
+    gap: 6px;
+}
+
+.badge {
+    background: #fff;
+    color: #667eea;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 10px;
+    min-width: 20px;
+    text-align: center;
+    line-height: 1.4;
+}
+
 /* 儲存報價單區域 */
 .saved-quotes-section {
     margin-bottom: 30px;
+    border: 2px solid #667eea;
+    background: #fafbff;
+}
+
+.saved-quotes-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.saved-quotes-header h2 {
+    margin-bottom: 0;
+}
+
+.btn-collapse {
+    background: none;
+    color: #667eea;
+    font-size: 13px;
+    padding: 6px 12px;
+    border: 1px solid #667eea;
+    border-radius: 5px;
+}
+
+.btn-collapse:hover {
+    background: #667eea;
+    color: white;
+}
+
+.saved-quotes-body {
+    margin-top: 16px;
+    transition: all 0.3s;
+}
+
+.saved-quotes-body.collapsed {
+    display: none;
+}
+
+.search-bar {
+    margin-bottom: 12px;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    transition: border-color 0.3s;
+    outline: none;
+}
+
+.search-bar input:focus {
+    border-color: #667eea;
 }
 
 .saved-quotes-list {
-    max-height: 320px;
+    max-height: 400px;
     overflow-y: auto;
 }
 
@@ -531,6 +605,15 @@ table input {
 .saved-quote-card:hover {
     border-color: #667eea;
     background: #f0f2ff;
+}
+
+.saved-quote-card.editing {
+    border-color: #ffc107;
+    background: #fffde7;
+}
+
+.saved-quote-card.hidden {
+    display: none;
 }
 
 .saved-quote-info {

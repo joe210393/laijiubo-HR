@@ -311,6 +311,12 @@ function renderSavedQuotes() {
     const container = document.getElementById('savedQuotesList');
     const quotes = getSavedQuotes();
 
+    // 更新數量顯示
+    const countEl = document.getElementById('quoteCount');
+    const navCountEl = document.getElementById('navQuoteCount');
+    if (countEl) countEl.textContent = quotes.length;
+    if (navCountEl) navCountEl.textContent = quotes.length;
+
     if (quotes.length === 0) {
         container.innerHTML = '<p class="empty-hint">尚未儲存任何報價單</p>';
         return;
@@ -320,8 +326,9 @@ function renderSavedQuotes() {
     quotes.forEach(q => {
         const d = q.data;
         const isEditing = editingQuoteId === q.id;
+        const searchText = [q.title, d.customerName, d.customerContact, d.customerTaxId, d.totalInclude, q.createdAt, q.updatedAt].join(' ').toLowerCase();
         html += `
-            <div class="saved-quote-card${isEditing ? ' editing' : ''}">
+            <div class="saved-quote-card${isEditing ? ' editing' : ''}" data-search="${escapeHtml(searchText)}">
                 <div class="saved-quote-info">
                     <div class="saved-quote-title">
                         ${escapeHtml(q.title)}
@@ -342,6 +349,34 @@ function renderSavedQuotes() {
         `;
     });
     container.innerHTML = html;
+}
+
+function filterQuotes() {
+    const keyword = document.getElementById('quoteSearch').value.trim().toLowerCase();
+    const cards = document.querySelectorAll('.saved-quote-card');
+    cards.forEach(card => {
+        const text = card.getAttribute('data-search') || '';
+        if (!keyword || text.includes(keyword)) {
+            card.classList.remove('hidden');
+        } else {
+            card.classList.add('hidden');
+        }
+    });
+}
+
+function toggleSavedQuotes() {
+    const body = document.getElementById('savedQuotesBody');
+    const btn = document.getElementById('btnCollapse');
+    const section = document.getElementById('savedQuotesSection');
+
+    if (body.classList.contains('collapsed')) {
+        body.classList.remove('collapsed');
+        btn.textContent = '收合 ▲';
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+        body.classList.toggle('collapsed');
+        btn.textContent = '展開 ▼';
+    }
 }
 
 function updateEditingIndicator() {

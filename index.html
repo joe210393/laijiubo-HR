@@ -14,16 +14,25 @@
     <nav class="top-nav">
         <a href="index.html" class="active">報價單系統</a>
         <a href="attendance.html">出缺勤打卡系統</a>
+        <a href="javascript:void(0)" class="nav-badge" onclick="toggleSavedQuotes()">📋 已儲存報價單 <span id="navQuoteCount" class="badge">0</span></a>
     </nav>
 
     <div class="container">
         <h1>報價單生成系統</h1>
 
         <!-- 已儲存的報價單 -->
-        <section class="section saved-quotes-section">
-            <h2>已儲存的報價單</h2>
-            <div id="savedQuotesList" class="saved-quotes-list">
-                <p class="empty-hint">尚未儲存任何報價單</p>
+        <section class="section saved-quotes-section" id="savedQuotesSection">
+            <div class="saved-quotes-header">
+                <h2>📋 已儲存的報價單 (<span id="quoteCount">0</span>)</h2>
+                <button class="btn btn-collapse" id="btnCollapse" onclick="toggleSavedQuotes()">收合 ▲</button>
+            </div>
+            <div id="savedQuotesBody" class="saved-quotes-body">
+                <div class="search-bar">
+                    <input type="text" id="quoteSearch" placeholder="🔍 搜尋報價單（編號、客戶名稱、金額...）" oninput="filterQuotes()">
+                </div>
+                <div id="savedQuotesList" class="saved-quotes-list">
+                    <p class="empty-hint">尚未儲存任何報價單</p>
+                </div>
             </div>
         </section>
         
@@ -223,6 +232,6 @@
         </section>
     </div>
 
-    <script src="script.js?v=2"></script>
+    <script src="script.js?v=3"></script>
 </body>
 </html>
