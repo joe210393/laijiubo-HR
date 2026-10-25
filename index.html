@@ -21,22 +21,15 @@
         <div class="list-container">
             <div class="list-top">
                 <h1>報價單管理</h1>
-                <button class="btn btn-new-big" onclick="openNewQuote()">＋ 新增報價單</button>
+                <button class="btn-fab" onclick="openNewQuote()" title="新增報價單">＋</button>
             </div>
 
-            <div class="list-search">
-                <input type="text" id="quoteSearch" placeholder="搜尋報價單編號、客戶名稱、金額…" oninput="filterQuotes()">
+            <div class="list-toolbar">
+                <input type="text" id="quoteSearch" class="list-search-input" placeholder="搜尋編號、客戶、金額…" oninput="filterQuotes()">
+                <div class="list-stats" id="listStats"></div>
             </div>
 
-            <div class="list-stats" id="listStats"></div>
-
-            <div class="list-grid" id="quoteListGrid">
-                <div class="list-empty">
-                    <div class="list-empty-icon">📄</div>
-                    <div class="list-empty-text">尚未儲存任何報價單</div>
-                    <button class="btn btn-primary" onclick="openNewQuote()" style="margin-top:16px;">建立第一張報價單</button>
-                </div>
-            </div>
+            <div class="list-table-wrap" id="quoteListGrid"></div>
         </div>
     </div>
 
@@ -228,6 +221,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=5"></script>
+    <script src="script.js?v=6"></script>
 </body>
 </html>

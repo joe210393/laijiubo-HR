@@ -330,55 +330,50 @@ function updateFormTitle() {
 }
 
 function renderSavedQuotes() {
-    const container = document.getElementById('quoteListGrid');
-    const statsEl = document.getElementById('listStats');
-    const quotes = getSavedQuotes();
+    var container = document.getElementById('quoteListGrid');
+    var statsEl = document.getElementById('listStats');
+    var quotes = getSavedQuotes();
 
-    statsEl.textContent = quotes.length > 0 ? '共 ' + quotes.length + ' 筆報價單' : '';
+    statsEl.textContent = quotes.length > 0 ? '共 ' + quotes.length + ' 筆' : '';
 
     if (quotes.length === 0) {
-        container.innerHTML = `
-            <div class="list-empty">
-                <div class="list-empty-icon">📄</div>
-                <div class="list-empty-text">尚未儲存任何報價單</div>
-                <button class="btn btn-primary" onclick="openNewQuote()" style="margin-top:16px;">建立第一張報價單</button>
-            </div>`;
+        container.innerHTML = '<table class="list-table">'
+            + '<thead><tr><th>編號</th><th>客戶</th><th>金額</th><th>建立日期</th><th>修改日期</th><th>操作</th></tr></thead>'
+            + '<tbody><tr class="list-empty-row"><td colspan="6">尚無報價單，點右上角 ＋ 新增</td></tr></tbody></table>';
         return;
     }
 
-    let html = '';
+    var html = '<table class="list-table"><thead><tr>'
+        + '<th>編號</th><th>客戶</th><th>金額</th><th>建立日期</th><th>修改日期</th><th>操作</th>'
+        + '</tr></thead><tbody>';
+
     quotes.forEach(function(q) {
         var d = q.data;
-        var searchText = [q.title, d.customerName, d.customerContact, d.customerTaxId, d.totalInclude, q.createdAt, q.updatedAt].join(' ').toLowerCase();
-        html += '<div class="quote-card" data-search="' + escapeHtml(searchText) + '" onclick="loadQuote(\'' + q.id + '\')">'
-            + '<div class="quote-card-body">'
-            +   '<div class="quote-card-row1">'
-            +     '<span class="quote-card-number">' + escapeHtml(q.title) + '</span>'
-            +     '<span class="quote-card-customer">' + escapeHtml(d.customerName || '') + '</span>'
-            +   '</div>'
-            +   '<div class="quote-card-row2">'
-            +     '<span>建立 ' + escapeHtml(q.createdAt) + '</span>'
-            +     (q.updatedAt !== q.createdAt ? '<span>修改 ' + escapeHtml(q.updatedAt) + '</span>' : '')
-            +   '</div>'
-            + '</div>'
-            + '<div class="quote-card-amount">$' + escapeHtml(d.totalInclude || '0') + '</div>'
-            + '<div class="quote-card-actions">'
-            +   '<button class="btn btn-load" onclick="event.stopPropagation();loadQuote(\'' + q.id + '\')">開啟</button>'
+        var search = [q.title, d.customerName, d.customerContact, d.customerTaxId, d.totalInclude, q.createdAt, q.updatedAt].join(' ').toLowerCase();
+        html += '<tr data-search="' + escapeHtml(search) + '" onclick="loadQuote(\'' + q.id + '\')">'
+            + '<td class="col-number">' + escapeHtml(q.title) + '</td>'
+            + '<td class="col-customer">' + escapeHtml(d.customerName || '—') + '</td>'
+            + '<td class="col-amount">$' + escapeHtml(d.totalInclude || '0') + '</td>'
+            + '<td class="col-date">' + escapeHtml(q.createdAt) + '</td>'
+            + '<td class="col-date">' + (q.updatedAt !== q.createdAt ? escapeHtml(q.updatedAt) : '—') + '</td>'
+            + '<td class="col-actions">'
+            +   '<button class="btn btn-open" onclick="event.stopPropagation();loadQuote(\'' + q.id + '\')">開啟</button>'
             +   '<button class="btn btn-delete" onclick="event.stopPropagation();deleteQuote(\'' + q.id + '\')">刪除</button>'
-            + '</div>'
-            + '</div>';
+            + '</td></tr>';
     });
+
+    html += '</tbody></table>';
     container.innerHTML = html;
 }
 
 function filterQuotes() {
     var keyword = document.getElementById('quoteSearch').value.trim().toLowerCase();
-    var cards = document.querySelectorAll('.quote-card');
+    var rows = document.querySelectorAll('.list-table tbody tr:not(.list-empty-row)');
     var visible = 0;
-    cards.forEach(function(card) {
-        var text = card.getAttribute('data-search') || '';
+    rows.forEach(function(row) {
+        var text = row.getAttribute('data-search') || '';
         var show = !keyword || text.indexOf(keyword) >= 0;
-        card.classList.toggle('hidden', !show);
+        row.classList.toggle('quote-row-hidden', !show);
         if (show) visible++;
     });
     var statsEl = document.getElementById('listStats');
@@ -386,7 +381,7 @@ function filterQuotes() {
     if (keyword && total > 0) {
         statsEl.textContent = '找到 ' + visible + ' / ' + total + ' 筆';
     } else {
-        statsEl.textContent = total > 0 ? '共 ' + total + ' 筆報價單' : '';
+        statsEl.textContent = total > 0 ? '共 ' + total + ' 筆' : '';
     }
 }
 
