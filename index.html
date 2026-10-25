@@ -14,222 +14,220 @@
     <nav class="top-nav">
         <a href="index.html" class="active">報價單系統</a>
         <a href="attendance.html">出缺勤打卡系統</a>
-        <a href="javascript:void(0)" class="nav-badge" onclick="toggleSavedQuotes()">📋 已儲存報價單 <span id="navQuoteCount" class="badge">0</span></a>
     </nav>
 
-    <!-- 側邊面板：已儲存的報價單 -->
-    <div class="panel-overlay" id="panelOverlay" onclick="closeSavedPanel()"></div>
-    <aside class="saved-panel" id="savedPanel">
-        <div class="panel-header">
-            <h2>已儲存的報價單</h2>
-            <button class="panel-close" onclick="closeSavedPanel()">&times;</button>
+    <!-- ========== 畫面一：報價單列表 ========== -->
+    <div id="listView" class="list-view">
+        <div class="list-container">
+            <div class="list-top">
+                <h1>報價單管理</h1>
+                <button class="btn btn-new-big" onclick="openNewQuote()">＋ 新增報價單</button>
+            </div>
+
+            <div class="list-search">
+                <input type="text" id="quoteSearch" placeholder="搜尋報價單編號、客戶名稱、金額…" oninput="filterQuotes()">
+            </div>
+
+            <div class="list-stats" id="listStats"></div>
+
+            <div class="list-grid" id="quoteListGrid">
+                <div class="list-empty">
+                    <div class="list-empty-icon">📄</div>
+                    <div class="list-empty-text">尚未儲存任何報價單</div>
+                    <button class="btn btn-primary" onclick="openNewQuote()" style="margin-top:16px;">建立第一張報價單</button>
+                </div>
+            </div>
         </div>
-        <div class="panel-search">
-            <input type="text" id="quoteSearch" placeholder="搜尋編號、客戶、金額…" oninput="filterQuotes()">
-        </div>
-        <div class="panel-count">共 <strong id="quoteCount">0</strong> 筆報價單</div>
-        <div class="panel-list" id="savedQuotesList"></div>
-    </aside>
-
-    <div class="container">
-        <h1>報價單生成系統</h1>
-        
-        <!-- 設定區域 -->
-        <section class="section settings-section">
-            <h2>基本資訊設定</h2>
-            
-            <div class="settings-grid">
-                <!-- 公司資訊設定 -->
-                <div class="settings-block">
-                    <h3>公司資訊</h3>
-                    <div class="form-group">
-                        <label>公司名稱：</label>
-                        <input type="text" id="companyName" placeholder="請輸入公司名稱">
-                    </div>
-                    <div class="form-group">
-                        <label>公司地址：</label>
-                        <input type="text" id="companyAddress" placeholder="請輸入公司地址">
-                    </div>
-                    <div class="form-group">
-                        <label>公司電話：</label>
-                        <input type="text" id="companyPhone" placeholder="請輸入公司電話">
-                    </div>
-                    <div class="form-group">
-                        <label>公司統一編號：</label>
-                        <input type="text" id="companyTaxId" placeholder="請輸入統一編號">
-                    </div>
-                    <div class="form-group">
-                        <label>公司Logo：</label>
-                        <input type="file" id="logoUpload" accept="image/*">
-                        <div id="logoPreview" class="image-preview"></div>
-                    </div>
-                </div>
-
-                <!-- 客戶資訊設定 -->
-                <div class="settings-block">
-                    <h3>
-                        客戶資訊
-                        <button type="button" class="btn btn-save-customer" onclick="saveCustomer()">儲存此客戶</button>
-                    </h3>
-                    <div class="form-group">
-                        <label>選擇已儲存的客戶：</label>
-                        <div class="customer-select-row">
-                            <select id="customerSelect" onchange="loadSelectedCustomer()">
-                                <option value="">— 請選擇或新增客戶 —</option>
-                            </select>
-                            <button type="button" class="btn btn-delete-sm" onclick="deleteCustomer()" title="刪除選取的客戶">✕</button>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>客戶公司名稱：</label>
-                        <input type="text" id="customerName" placeholder="請輸入客戶公司名稱">
-                    </div>
-                    <div class="form-group">
-                        <label>負責人：</label>
-                        <input type="text" id="customerContact" placeholder="請輸入負責人">
-                    </div>
-                    <div class="form-group">
-                        <label>電話：</label>
-                        <input type="text" id="customerPhone" placeholder="請輸入電話">
-                    </div>
-                    <div class="form-group">
-                        <label>統一編號：</label>
-                        <input type="text" id="customerTaxId" placeholder="請輸入統一編號">
-                    </div>
-                </div>
-            </div>
-
-            <!-- 發票章設定 -->
-            <div class="form-group">
-                <label>發票章圖片：</label>
-                <input type="file" id="stampUpload" accept="image/*">
-                <div id="stampPreview" class="image-preview"></div>
-            </div>
-
-            <!-- 報價單資訊 -->
-            <div class="form-row">
-                <div class="form-group">
-                    <label>報價日期：</label>
-                    <input type="date" id="quoteDate">
-                </div>
-                <div class="form-group">
-                    <label>有效期限：</label>
-                    <input type="date" id="validUntil">
-                </div>
-            </div>
-        </section>
-
-        <!-- 商品列表區 -->
-        <section class="section products">
-            <h2>商品明細</h2>
-            <div class="quote-header">
-                <div class="form-group quote-number-group">
-                    <label>報價單編號：</label>
-                    <input type="text" id="quoteNumber" placeholder="自動生成或手動輸入" class="quote-number-input">
-                </div>
-            </div>
-            <div class="tax-option">
-                <label>
-                    <input type="radio" name="taxType" value="exclude" checked> 未含稅
-                </label>
-                <label>
-                    <input type="radio" name="taxType" value="include"> 含稅
-                </label>
-            </div>
-            <table id="productsTable">
-                <thead>
-                    <tr>
-                        <th>序號</th>
-                        <th>品項</th>
-                        <th>數量</th>
-                        <th>單價</th>
-                        <th>未含稅金額</th>
-                        <th>稅額 (5%)</th>
-                        <th>含稅金額</th>
-                        <th>操作</th>
-                    </tr>
-                </thead>
-                <tbody id="productsBody">
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="4" class="text-right"><strong>小計：</strong></td>
-                        <td id="subtotalExclude">0</td>
-                        <td id="subtotalTax">0</td>
-                        <td id="subtotalInclude">0</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td colspan="4" class="text-right"><strong>總計：</strong></td>
-                        <td id="totalExclude">0</td>
-                        <td id="totalTax">0</td>
-                        <td id="totalInclude" class="total-amount">0</td>
-                        <td></td>
-                    </tr>
-                </tfoot>
-            </table>
-            <button type="button" class="btn btn-add" onclick="addProduct()">新增商品</button>
-        </section>
-
-        <!-- 備註區 -->
-        <section class="section notes">
-            <h2>備註說明</h2>
-            <textarea id="notes" rows="4" placeholder="請輸入備註說明..."></textarea>
-        </section>
-
-        <!-- 報價單預覽區域 -->
-        <section class="section quote-preview-section">
-            <h2>報價單預覽</h2>
-            <div class="quote-preview">
-                <!-- Logo 左上角 -->
-                <div class="quote-logo" id="quoteLogoPreview"></div>
-                
-                <!-- 報價公司資訊區塊 -->
-                <div class="quote-company-block">
-                    <div class="quote-label">報價公司</div>
-                    <div id="previewCompanyName" class="quote-text"></div>
-                    <div id="previewCompanyAddress" class="quote-text"></div>
-                    <div id="previewCompanyPhone" class="quote-text"></div>
-                    <div id="previewCompanyTaxId" class="quote-text"></div>
-                </div>
-
-                <!-- 客戶資訊區塊 -->
-                <div class="quote-customer-block">
-                    <div class="quote-label">客戶資訊</div>
-                    <div id="previewCustomerName" class="quote-text"></div>
-                    <div id="previewCustomerContact" class="quote-text"></div>
-                    <div id="previewCustomerPhone" class="quote-text"></div>
-                    <div id="previewCustomerTaxId" class="quote-text"></div>
-                </div>
-
-                <!-- 報價單編號（表格上方左側） -->
-                <div class="quote-number-preview">
-                    <span id="previewQuoteNumber"></span>
-                </div>
-
-                <!-- 日期資訊（發票章左邊） -->
-                <div class="quote-dates">
-                    <div id="previewQuoteDate"></div>
-                    <div id="previewValidUntil"></div>
-                </div>
-
-                <!-- 發票章（右下角虛線框） -->
-                <div class="quote-stamp-box">
-                    <div class="stamp-box-label">發票章</div>
-                    <div class="stamp-box-content" id="quoteStampPreview"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 操作按鈕 -->
-        <section class="section actions">
-            <button type="button" class="btn btn-save" onclick="saveQuote()">💾 儲存報價單</button>
-            <button type="button" class="btn btn-primary" onclick="generatePDF()">生成PDF報價單</button>
-            <button type="button" class="btn btn-new" onclick="newQuote()">📄 新增報價單</button>
-            <button type="button" class="btn btn-secondary" onclick="clearAll()">清除所有資料</button>
-        </section>
     </div>
 
-    <script src="script.js?v=4"></script>
+    <!-- ========== 畫面二：報價單編輯 ========== -->
+    <div id="formView" class="form-view" style="display:none;">
+        <div class="container">
+            <!-- 返回列表按鈕 -->
+            <div class="form-topbar">
+                <button class="btn btn-back" onclick="backToList()">← 返回列表</button>
+                <div class="form-topbar-title" id="formTitle">新增報價單</div>
+                <div class="form-topbar-actions">
+                    <button class="btn btn-save" onclick="saveQuote()">💾 儲存</button>
+                    <button class="btn btn-primary" onclick="generatePDF()">📥 生成PDF</button>
+                </div>
+            </div>
+
+            <!-- 設定區域 -->
+            <section class="section settings-section">
+                <h2>基本資訊設定</h2>
+                <div class="settings-grid">
+                    <div class="settings-block">
+                        <h3>公司資訊</h3>
+                        <div class="form-group">
+                            <label>公司名稱：</label>
+                            <input type="text" id="companyName" placeholder="請輸入公司名稱">
+                        </div>
+                        <div class="form-group">
+                            <label>公司地址：</label>
+                            <input type="text" id="companyAddress" placeholder="請輸入公司地址">
+                        </div>
+                        <div class="form-group">
+                            <label>公司電話：</label>
+                            <input type="text" id="companyPhone" placeholder="請輸入公司電話">
+                        </div>
+                        <div class="form-group">
+                            <label>公司統一編號：</label>
+                            <input type="text" id="companyTaxId" placeholder="請輸入統一編號">
+                        </div>
+                        <div class="form-group">
+                            <label>公司Logo：</label>
+                            <input type="file" id="logoUpload" accept="image/*">
+                            <div id="logoPreview" class="image-preview"></div>
+                        </div>
+                    </div>
+
+                    <div class="settings-block">
+                        <h3>
+                            客戶資訊
+                            <button type="button" class="btn btn-save-customer" onclick="saveCustomer()">儲存此客戶</button>
+                        </h3>
+                        <div class="form-group">
+                            <label>選擇已儲存的客戶：</label>
+                            <div class="customer-select-row">
+                                <select id="customerSelect" onchange="loadSelectedCustomer()">
+                                    <option value="">— 請選擇或新增客戶 —</option>
+                                </select>
+                                <button type="button" class="btn btn-delete-sm" onclick="deleteCustomer()" title="刪除選取的客戶">✕</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>客戶公司名稱：</label>
+                            <input type="text" id="customerName" placeholder="請輸入客戶公司名稱">
+                        </div>
+                        <div class="form-group">
+                            <label>負責人：</label>
+                            <input type="text" id="customerContact" placeholder="請輸入負責人">
+                        </div>
+                        <div class="form-group">
+                            <label>電話：</label>
+                            <input type="text" id="customerPhone" placeholder="請輸入電話">
+                        </div>
+                        <div class="form-group">
+                            <label>統一編號：</label>
+                            <input type="text" id="customerTaxId" placeholder="請輸入統一編號">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>發票章圖片：</label>
+                    <input type="file" id="stampUpload" accept="image/*">
+                    <div id="stampPreview" class="image-preview"></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>報價日期：</label>
+                        <input type="date" id="quoteDate">
+                    </div>
+                    <div class="form-group">
+                        <label>有效期限：</label>
+                        <input type="date" id="validUntil">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 商品列表區 -->
+            <section class="section products">
+                <h2>商品明細</h2>
+                <div class="quote-header">
+                    <div class="form-group quote-number-group">
+                        <label>報價單編號：</label>
+                        <input type="text" id="quoteNumber" placeholder="自動生成或手動輸入" class="quote-number-input">
+                    </div>
+                </div>
+                <div class="tax-option">
+                    <label><input type="radio" name="taxType" value="exclude" checked> 未含稅</label>
+                    <label><input type="radio" name="taxType" value="include"> 含稅</label>
+                </div>
+                <table id="productsTable">
+                    <thead>
+                        <tr>
+                            <th>序號</th>
+                            <th>品項</th>
+                            <th>數量</th>
+                            <th>單價</th>
+                            <th>未含稅金額</th>
+                            <th>稅額 (5%)</th>
+                            <th>含稅金額</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsBody"></tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4" class="text-right"><strong>小計：</strong></td>
+                            <td id="subtotalExclude">0</td>
+                            <td id="subtotalTax">0</td>
+                            <td id="subtotalInclude">0</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="text-right"><strong>總計：</strong></td>
+                            <td id="totalExclude">0</td>
+                            <td id="totalTax">0</td>
+                            <td id="totalInclude" class="total-amount">0</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <button type="button" class="btn btn-add" onclick="addProduct()">新增商品</button>
+            </section>
+
+            <!-- 備註區 -->
+            <section class="section notes">
+                <h2>備註說明</h2>
+                <textarea id="notes" rows="4" placeholder="請輸入備註說明..."></textarea>
+            </section>
+
+            <!-- 報價單預覽區域 -->
+            <section class="section quote-preview-section">
+                <h2>報價單預覽</h2>
+                <div class="quote-preview">
+                    <div class="quote-logo" id="quoteLogoPreview"></div>
+                    <div class="quote-company-block">
+                        <div class="quote-label">報價公司</div>
+                        <div id="previewCompanyName" class="quote-text"></div>
+                        <div id="previewCompanyAddress" class="quote-text"></div>
+                        <div id="previewCompanyPhone" class="quote-text"></div>
+                        <div id="previewCompanyTaxId" class="quote-text"></div>
+                    </div>
+                    <div class="quote-customer-block">
+                        <div class="quote-label">客戶資訊</div>
+                        <div id="previewCustomerName" class="quote-text"></div>
+                        <div id="previewCustomerContact" class="quote-text"></div>
+                        <div id="previewCustomerPhone" class="quote-text"></div>
+                        <div id="previewCustomerTaxId" class="quote-text"></div>
+                    </div>
+                    <div class="quote-number-preview">
+                        <span id="previewQuoteNumber"></span>
+                    </div>
+                    <div class="quote-dates">
+                        <div id="previewQuoteDate"></div>
+                        <div id="previewValidUntil"></div>
+                    </div>
+                    <div class="quote-stamp-box">
+                        <div class="stamp-box-label">發票章</div>
+                        <div class="stamp-box-content" id="quoteStampPreview"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 底部操作按鈕 -->
+            <section class="section actions">
+                <button type="button" class="btn btn-save" onclick="saveQuote()">💾 儲存報價單</button>
+                <button type="button" class="btn btn-primary" onclick="generatePDF()">生成PDF報價單</button>
+                <button type="button" class="btn btn-back-bottom" onclick="backToList()">← 返回列表</button>
+            </section>
+        </div>
+    </div>
+
+    <script src="script.js?v=5"></script>
 </body>
 </html>
