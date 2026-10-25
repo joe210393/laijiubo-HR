@@ -252,6 +252,7 @@ function loadQuote(id) {
     updateQuotePreview();
     calculateTotal();
     renderSavedQuotes();
+    closeSavedPanel();
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -311,14 +312,17 @@ function renderSavedQuotes() {
     const container = document.getElementById('savedQuotesList');
     const quotes = getSavedQuotes();
 
-    // 更新數量顯示
     const countEl = document.getElementById('quoteCount');
     const navCountEl = document.getElementById('navQuoteCount');
     if (countEl) countEl.textContent = quotes.length;
     if (navCountEl) navCountEl.textContent = quotes.length;
 
     if (quotes.length === 0) {
-        container.innerHTML = '<p class="empty-hint">尚未儲存任何報價單</p>';
+        container.innerHTML = `
+            <div class="panel-empty">
+                <span class="panel-empty-icon">📄</span>
+                <div class="panel-empty-text">尚未儲存任何報價單<br>填寫完畢後按「💾 儲存報價單」</div>
+            </div>`;
         return;
     }
 
@@ -328,22 +332,20 @@ function renderSavedQuotes() {
         const isEditing = editingQuoteId === q.id;
         const searchText = [q.title, d.customerName, d.customerContact, d.customerTaxId, d.totalInclude, q.createdAt, q.updatedAt].join(' ').toLowerCase();
         html += `
-            <div class="saved-quote-card${isEditing ? ' editing' : ''}" data-search="${escapeHtml(searchText)}">
-                <div class="saved-quote-info">
-                    <div class="saved-quote-title">
-                        ${escapeHtml(q.title)}
-                        ${isEditing ? '<span class="editing-indicator">編輯中</span>' : ''}
-                    </div>
-                    <div class="saved-quote-meta">
-                        <span>客戶：${escapeHtml(d.customerName || '—')}</span>
-                        <span>金額：${escapeHtml(d.totalInclude || '0')}</span>
-                        <span>建立：${escapeHtml(q.createdAt)}</span>
-                        ${q.updatedAt !== q.createdAt ? `<span>修改：${escapeHtml(q.updatedAt)}</span>` : ''}
-                    </div>
+            <div class="quote-card${isEditing ? ' editing' : ''}" data-search="${escapeHtml(searchText)}">
+                <div class="quote-card-top">
+                    <div class="quote-card-number">${escapeHtml(q.title)}</div>
+                    <div class="quote-card-amount">$${escapeHtml(d.totalInclude || '0')}</div>
                 </div>
-                <div class="saved-quote-actions">
+                <div class="quote-card-customer">${escapeHtml(d.customerName || '—')}</div>
+                <div class="quote-card-dates">
+                    <span>建立 ${escapeHtml(q.createdAt)}</span>
+                    ${q.updatedAt !== q.createdAt ? `<span>修改 ${escapeHtml(q.updatedAt)}</span>` : ''}
+                </div>
+                ${isEditing ? '<span class="quote-card-tag editing-tag">● 編輯中</span>' : ''}
+                <div class="quote-card-actions">
                     <button class="btn btn-load" onclick="loadQuote('${q.id}')">載入修改</button>
-                    <button class="btn btn-delete" onclick="deleteQuote('${q.id}')">刪除</button>
+                    <button class="btn btn-delete" onclick="event.stopPropagation();deleteQuote('${q.id}')">刪除</button>
                 </div>
             </div>
         `;
@@ -353,29 +355,32 @@ function renderSavedQuotes() {
 
 function filterQuotes() {
     const keyword = document.getElementById('quoteSearch').value.trim().toLowerCase();
-    const cards = document.querySelectorAll('.saved-quote-card');
+    const cards = document.querySelectorAll('.quote-card');
     cards.forEach(card => {
         const text = card.getAttribute('data-search') || '';
-        if (!keyword || text.includes(keyword)) {
-            card.classList.remove('hidden');
-        } else {
-            card.classList.add('hidden');
-        }
+        card.classList.toggle('hidden', keyword !== '' && !text.includes(keyword));
     });
 }
 
-function toggleSavedQuotes() {
-    const body = document.getElementById('savedQuotesBody');
-    const btn = document.getElementById('btnCollapse');
-    const section = document.getElementById('savedQuotesSection');
+function openSavedPanel() {
+    document.getElementById('savedPanel').classList.add('open');
+    document.getElementById('panelOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('quoteSearch').focus();
+}
 
-    if (body.classList.contains('collapsed')) {
-        body.classList.remove('collapsed');
-        btn.textContent = '收合 ▲';
-        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+function closeSavedPanel() {
+    document.getElementById('savedPanel').classList.remove('open');
+    document.getElementById('panelOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+function toggleSavedQuotes() {
+    const panel = document.getElementById('savedPanel');
+    if (panel.classList.contains('open')) {
+        closeSavedPanel();
     } else {
-        body.classList.toggle('collapsed');
-        btn.textContent = '展開 ▼';
+        openSavedPanel();
     }
 }
 

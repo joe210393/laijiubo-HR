@@ -518,137 +518,217 @@ table input {
     line-height: 1.4;
 }
 
-/* 儲存報價單區域 */
-.saved-quotes-section {
-    margin-bottom: 30px;
-    border: 2px solid #667eea;
-    background: #fafbff;
+/* ====== 側邊面板 ====== */
+.panel-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 900;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
 }
 
-.saved-quotes-header {
+.panel-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.saved-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 460px;
+    max-width: 92vw;
+    height: 100vh;
+    background: #fff;
+    box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+    z-index: 950;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(.4,0,.2,1);
 }
 
-.saved-quotes-header h2 {
-    margin-bottom: 0;
+.saved-panel.open {
+    transform: translateX(0);
 }
 
-.btn-collapse {
-    background: none;
-    color: #667eea;
-    font-size: 13px;
-    padding: 6px 12px;
-    border: 1px solid #667eea;
-    border-radius: 5px;
-}
-
-.btn-collapse:hover {
-    background: #667eea;
-    color: white;
-}
-
-.saved-quotes-body {
-    margin-top: 16px;
-    transition: all 0.3s;
-}
-
-.saved-quotes-body.collapsed {
-    display: none;
-}
-
-.search-bar {
-    margin-bottom: 12px;
-}
-
-.search-bar input {
-    width: 100%;
-    padding: 12px 16px;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    font-size: 15px;
-    font-family: inherit;
-    transition: border-color 0.3s;
-    outline: none;
-}
-
-.search-bar input:focus {
-    border-color: #667eea;
-}
-
-.saved-quotes-list {
-    max-height: 400px;
-    overflow-y: auto;
-}
-
-.empty-hint {
-    color: #999;
-    text-align: center;
-    padding: 20px;
-    font-size: 14px;
-}
-
-.saved-quote-card {
+.panel-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 16px;
-    border: 1px solid #e8e8e8;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    background: #fafbff;
-    transition: all 0.15s;
-    gap: 12px;
-}
-
-.saved-quote-card:hover {
-    border-color: #667eea;
-    background: #f0f2ff;
-}
-
-.saved-quote-card.editing {
-    border-color: #ffc107;
-    background: #fffde7;
-}
-
-.saved-quote-card.hidden {
-    display: none;
-}
-
-.saved-quote-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.saved-quote-title {
-    font-weight: 700;
-    font-size: 15px;
-    color: #333;
-    margin-bottom: 3px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.saved-quote-meta {
-    font-size: 12px;
-    color: #888;
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-}
-
-.saved-quote-actions {
-    display: flex;
-    gap: 6px;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid #eee;
     flex-shrink: 0;
 }
 
-.saved-quote-actions .btn {
-    padding: 6px 14px;
+.panel-header h2 {
+    margin: 0;
+    font-size: 1.2em;
+    color: #333;
+    border-left: 4px solid #667eea;
+    padding-left: 12px;
+}
+
+.panel-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #999;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 4px;
+    transition: color 0.15s;
+}
+
+.panel-close:hover {
+    color: #333;
+}
+
+.panel-search {
+    padding: 16px 24px 0;
+    flex-shrink: 0;
+}
+
+.panel-search input {
+    width: 100%;
+    padding: 11px 16px 11px 40px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+    background: #f8f9fa url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23999' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.656a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E") 14px center no-repeat;
+}
+
+.panel-search input:focus {
+    border-color: #667eea;
+    background-color: #fff;
+}
+
+.panel-count {
+    padding: 10px 24px 4px;
+    font-size: 13px;
+    color: #999;
+    flex-shrink: 0;
+}
+
+.panel-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 24px 24px;
+}
+
+.panel-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #bbb;
+}
+
+.panel-empty-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.panel-empty-text {
+    font-size: 15px;
+}
+
+/* 報價單卡片 */
+.quote-card {
+    border: 1px solid #e8e8e8;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 10px;
+    background: #fff;
+    transition: all 0.15s;
+    cursor: pointer;
+}
+
+.quote-card:hover {
+    border-color: #667eea;
+    box-shadow: 0 2px 12px rgba(102,126,234,0.12);
+    transform: translateY(-1px);
+}
+
+.quote-card.editing {
+    border-color: #667eea;
+    background: #f0f2ff;
+    box-shadow: 0 0 0 2px rgba(102,126,234,0.15);
+}
+
+.quote-card.hidden {
+    display: none;
+}
+
+.quote-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.quote-card-number {
+    font-weight: 700;
+    font-size: 15px;
+    color: #667eea;
+}
+
+.quote-card-amount {
+    font-weight: 800;
+    font-size: 16px;
+    color: #333;
+    white-space: nowrap;
+}
+
+.quote-card-customer {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.quote-card-dates {
     font-size: 12px;
-    border-radius: 5px;
+    color: #aaa;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.quote-card-tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    background: #e8f5e9;
+    color: #388e3c;
+}
+
+.quote-card-tag.editing-tag {
+    background: #e8eaff;
+    color: #667eea;
+}
+
+.quote-card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.quote-card-actions .btn {
+    flex: 1;
+    padding: 8px 0;
+    font-size: 13px;
+    border-radius: 8px;
+    text-align: center;
 }
 
 .btn-load {
@@ -660,6 +740,7 @@ table input {
     background: #5568d3;
 }
 
+/* 操作按鈕 */
 .btn-save {
     background: #17a2b8;
     color: white;
@@ -668,7 +749,7 @@ table input {
 .btn-save:hover {
     background: #138496;
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(23, 162, 184, 0.4);
+    box-shadow: 0 5px 15px rgba(23,162,184,0.4);
 }
 
 .btn-new {
@@ -680,19 +761,26 @@ table input {
 .btn-new:hover {
     background: #218838;
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+    box-shadow: 0 5px 15px rgba(40,167,69,0.4);
 }
 
 .editing-indicator {
     display: inline-block;
-    background: #fff3cd;
-    color: #856404;
+    background: #e8eaff;
+    color: #667eea;
     padding: 4px 12px;
     border-radius: 12px;
     font-size: 13px;
     font-weight: 600;
     margin-left: 12px;
-    border: 1px solid #ffc107;
+    border: 1px solid #c5caf7;
+}
+
+@media (max-width: 500px) {
+    .saved-panel {
+        width: 100vw;
+        max-width: 100vw;
+    }
 }
 
 @media print {
