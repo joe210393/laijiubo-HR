@@ -66,7 +66,7 @@ function loadCompanyInfo() {
 // ====== 客戶管理 ======
 function getCustomers() {
     try { return JSON.parse(localStorage.getItem('quote_customers') || '[]'); }
-    catch { return []; }
+    catch (e) { return []; }
 }
 
 function saveCustomersData(list) {
@@ -138,7 +138,7 @@ function deleteCustomer() {
 // ====== 報價單儲存/讀取 ======
 function getSavedQuotes() {
     try { return JSON.parse(localStorage.getItem('saved_quotes') || '[]'); }
-    catch { return []; }
+    catch (e) { return []; }
 }
 
 function saveSavedQuotes(list) {
