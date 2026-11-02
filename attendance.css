@@ -891,7 +891,22 @@ h2 {
 
 /* 列印 */
 @media print {
-    .btn-auto {
+    .btn-auto,
+    .btn-clock,
+    .btn-clock-out,
+    .btn-edit,
+    .btn-sm,
+    .top-nav {
         display: none !important;
+    }
+
+    body {
+        background: white;
+    }
+
+    .today-status {
+        background: #667eea !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 }
