@@ -888,3 +888,10 @@ h2 {
         font-size: 13px;
     }
 }
+
+/* 列印 */
+@media print {
+    .btn-auto {
+        display: none !important;
+    }
+}
