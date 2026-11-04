@@ -338,32 +338,65 @@ function renderSavedQuotes() {
 
     if (quotes.length === 0) {
         container.innerHTML = '<table class="list-table">'
-            + '<thead><tr><th>編號</th><th>客戶</th><th>金額</th><th>建立日期</th><th>修改日期</th><th>操作</th></tr></thead>'
+            + '<thead><tr><th>報價單號</th><th>客戶名稱</th><th>金額</th><th>日期</th><th>明細</th><th>操作</th></tr></thead>'
             + '<tbody><tr class="list-empty-row"><td colspan="6">尚無報價單，點右上角 ＋ 新增</td></tr></tbody></table>';
         return;
     }
 
     var html = '<table class="list-table"><thead><tr>'
-        + '<th>編號</th><th>客戶</th><th>金額</th><th>建立日期</th><th>修改日期</th><th>操作</th>'
+        + '<th>報價單號</th><th>客戶名稱</th><th>金額</th><th>日期</th><th>明細</th><th>操作</th>'
         + '</tr></thead><tbody>';
 
-    quotes.forEach(function(q) {
+    quotes.forEach(function(q, idx) {
         var d = q.data;
-        var search = [q.title, d.customerName, d.customerContact, d.customerTaxId, d.totalInclude, q.createdAt, q.updatedAt].join(' ').toLowerCase();
-        html += '<tr data-search="' + escapeHtml(search) + '" onclick="loadQuote(\'' + q.id + '\')">'
+        var search = [q.title, d.customerName, d.customerContact, d.customerTaxId, d.totalInclude, d.quoteDate, q.createdAt].join(' ').toLowerCase();
+
+        var detailHtml = '';
+        if (d.products && d.products.length > 0) {
+            detailHtml += '<table class="detail-inner-table">'
+                + '<tr><th>品項</th><th>數量</th><th>單價</th></tr>';
+            d.products.forEach(function(p) {
+                if (p.name) {
+                    detailHtml += '<tr><td>' + escapeHtml(p.name) + '</td>'
+                        + '<td>' + escapeHtml(p.quantity) + '</td>'
+                        + '<td>$' + escapeHtml(Number(p.price).toLocaleString()) + '</td></tr>';
+                }
+            });
+            detailHtml += '</table>';
+            if (d.notes) {
+                detailHtml += '<div class="detail-inner-note">備註：' + escapeHtml(d.notes) + '</div>';
+            }
+        }
+
+        html += '<tr data-search="' + escapeHtml(search) + '">'
             + '<td class="col-number">' + escapeHtml(q.title) + '</td>'
             + '<td class="col-customer">' + escapeHtml(d.customerName || '—') + '</td>'
             + '<td class="col-amount">$' + escapeHtml(d.totalInclude || '0') + '</td>'
-            + '<td class="col-date">' + escapeHtml(q.createdAt) + '</td>'
-            + '<td class="col-date">' + (q.updatedAt !== q.createdAt ? escapeHtml(q.updatedAt) : '—') + '</td>'
+            + '<td class="col-date">' + escapeHtml(d.quoteDate || '—') + '</td>'
+            + '<td class="col-detail"><button class="btn btn-detail" onclick="event.stopPropagation();toggleDetail(\'detail-' + idx + '\')">查看 ▼</button></td>'
             + '<td class="col-actions">'
             +   '<button class="btn btn-open" onclick="event.stopPropagation();loadQuote(\'' + q.id + '\')">開啟</button>'
             +   '<button class="btn btn-delete" onclick="event.stopPropagation();deleteQuote(\'' + q.id + '\')">刪除</button>'
-            + '</td></tr>';
+            + '</td></tr>'
+            + '<tr class="detail-row" id="detail-' + idx + '" style="display:none;">'
+            + '<td colspan="6"><div class="detail-inner">' + (detailHtml || '<span style="color:#999;">無品項資料</span>') + '</div></td>'
+            + '</tr>';
     });
 
     html += '</tbody></table>';
     container.innerHTML = html;
+}
+
+function toggleDetail(id) {
+    var row = document.getElementById(id);
+    var btn = row.previousElementSibling.querySelector('.btn-detail');
+    if (row.style.display === 'none') {
+        row.style.display = '';
+        btn.textContent = '收合 ▲';
+    } else {
+        row.style.display = 'none';
+        btn.textContent = '查看 ▼';
+    }
 }
 
 function filterQuotes() {

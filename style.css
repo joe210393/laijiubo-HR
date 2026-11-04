@@ -690,6 +690,76 @@ table input {
     display: none;
 }
 
+/* 明細按鈕 */
+.btn-detail {
+    background: #f0f2ff;
+    color: #667eea;
+    border: 1px solid #667eea;
+    padding: 5px 14px;
+    font-size: 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+    font-weight: 600;
+}
+
+.btn-detail:hover {
+    background: #667eea;
+    color: white;
+}
+
+/* 展開的明細行 */
+.detail-row td {
+    padding: 0 !important;
+    border-bottom: 1px solid #e0e0e0 !important;
+    background: #fafbff;
+}
+
+.detail-row:hover {
+    background: #fafbff !important;
+}
+
+.detail-inner {
+    padding: 16px 20px;
+}
+
+.detail-inner-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.detail-inner-table th {
+    text-align: left;
+    padding: 6px 12px;
+    background: #eef0ff;
+    color: #555;
+    font-weight: 600;
+    font-size: 12px;
+    border-bottom: 1px solid #dde;
+}
+
+.detail-inner-table td {
+    padding: 6px 12px;
+    border-bottom: 1px solid #eee;
+    color: #444;
+}
+
+.detail-inner-note {
+    font-size: 13px;
+    color: #888;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed #ddd;
+}
+
+.col-detail {
+    text-align: center;
+    white-space: nowrap;
+}
+
 /* 表單畫面 */
 .form-view {
     padding-top: 0;
